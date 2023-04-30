@@ -10,39 +10,22 @@ In the cluster mode, the Ecovisor can manage a cluster of LXD servers.
 To run this, you should have LXD installed.
 If not, follow the instructions below:
 ```
-Snap install lxd
+snap install lxd
 lxd init
 ```
 
-You can choose the default values or custom options as per your system. For storage backend, I recommend using brtfs. 
+For more information about setting up LXD, please visit https://linuxcontainers.org/lxd/docs/latest/installing/
 
-Then try creating a container using ubuntu image:
-```
-lxc launch ubuntu:22.04 <name of container> 
-```
-
-If this is successful, you can see the list of running containers using:
-```
-lxc list
-```
-
-Other commands to explore:
-```
-lxc exec <name of container> – /bin/bash
-Lxc <start/stop/restart/pause/delete> <container name> (you can use –force flag to force it)
-```
-
-Once you have lxd installed and running, install the following packages to setup energy hypervisor locally:
+Once you have LXD set, install the following dependencies with pip:
 
 ```
-Install pip
 pip install rpyc pylxd
 ```
 
-Now you would need to fetch the lxd certificate and key to run lxd via energy-hypervisor.
-These are usually two ways to get certificates to access LXD’s API. The easiest, is the following:
+Now you would need to create and add a certificate to properly authenticate the Ecovisor with LXD.
+These are usually two ways to get certificates to access LXD’s API. The easiest is to use the one already created with LXD:
 
-1. Become admin, i.e., sudo su
+1. Become admin (e.g., sudo su, or su)
 2. Copy the two certificate and key files into your directory:
 ```
 cp /var/snap/lxd/{server.crt,server.key} .
@@ -54,7 +37,24 @@ cp /var/lib/lxd/{server.crt,server.key} .
 cp /var/snap/lxd/common/lxd/{server.crt,server.key} .
 ```
 
-Once you have the path to certificate and key, you are ready to run energy-hypervisor.
+A second way, is to generate and sign the certificates yourself, and then add them into LXD to grant users owning such certificate with access. To do so, follow these commands:
+
+1. ```lxc config set core.https_address [::]:8443```
+2. ```lxc config set core.https_allowed_origin "*"```
+3. ```lxc config set core.https_allowed_methods "GET, POST, PUT, DELETE, OPTIONS"```
+4. ```lxc config set core.https_allowed_headers "Content-Type"```
+5. This is just to keep the files related to authentication in a separate directory:
+```mkdir lxd-api-access-cert-key-files; cd lxd-api-access-cert-key-files```
+6. This generates a private key for you:
+```openssl genrsa -out lxd.key 4096```
+7. This creates a certificate signing request, to be signed with the key you created in Step 6:
+```openssl req -new -key lxd.key -out lxd.csr```
+8. This finally self-signs and create an expiration date for the certificate:
+```openssl x509 -req -days 3650 -in lxd.csr -signkey lxd.key -out lxd.crt```
+9. This adds the certificate you just created into the LXD cluster, granting access to the cluster to whoever uses it (i.e., the Ecovisor):
+```lxc config trust add lxd.crt```
+
+Once you have the path to certificate and key, you are ready to run Ecovisor.
 
 ### Run
 
