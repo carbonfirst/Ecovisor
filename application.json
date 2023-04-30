@@ -1,0 +1,47 @@
+{
+    "name": "blast",
+    "regex": "carbonfirst",
+    "image": "ubuntu",
+    "server": "https://cloud-images.ubuntu.com/daily",
+    "protocol": "simplestreams",
+    "vbattery_cap": "10",
+    "vsolar_panels": "10",
+    "total_co2_quota": "100",
+    "co2_rate": null,
+    "total_grid_quota": "10",
+    "app_controller_url": "",
+    "update_cmd": "kill -s USR1",
+    "replica_instance": "w",
+    "autoscaler": "auto",
+    "instances":
+    [
+        {
+            "container_name": "m",
+            "replicas": "1",
+            "cpu_quota": "1.0",
+            "type": "container",
+            "start_cmd": "sleep 10000",
+            "devices": {
+                "shareddir": {
+                    "path": "/tmp/shareddir",
+                    "source": "/tmp/shareddir",
+                    "type": "disk"
+                }
+            }
+        },
+        {
+            "container_name": "w",
+            "replicas": "2",
+            "cpu_quota": "0.75",
+            "type": "container",
+            "start_cmd": "sleep 10000"
+        }
+    ],
+    "vars":
+    [
+        {
+            "key": "lxd_hosts.blast.env",
+            "value": "$LXD_HOSTS"
+        }
+    ]
+}
