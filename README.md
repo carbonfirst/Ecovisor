@@ -1,15 +1,13 @@
-# energy-hypervisor
+# Ecovisor
 
-Repo for energy hypervisor
+## Functionality to run Ecovisor in local or cluster modes
 
-## Functionality to run energy-hypervisor locally as well
-
-
-Energy hypervisor can be run locally.
+In local mode, applications are managed as containers within your computer or server.
+In the cluster mode, the Ecovisor can manage a cluster of LXD servers.
 
 ### Setup
 
-To run this, you should have lxd installed.
+To run this, you should have LXD installed.
 If not, follow the instructions below:
 ```
 Snap install lxd
@@ -38,12 +36,12 @@ Once you have lxd installed and running, install the following packages to setup
 
 ```
 Install pip
-pip install rpyc
-pip install pylxd
+pip install rpyc pylxd
 ```
 
 Now you would need to fetch the lxd certificate and key to run lxd via energy-hypervisor.
 These are usually two ways to get certificates to access LXD’s API. The easiest, is the following:
+
 1. Become admin, i.e., sudo su
 2. Copy the two certificate and key files into your directory:
 ```
@@ -62,7 +60,7 @@ Once you have the path to certificate and key, you are ready to run energy-hyper
 
 1. First run Carbon Manager using:
 ```
-python3 CarbonManager.py --lxd-cert <path to lxd certificate in single quotes> --lxd-key <path to lxd key in single quotes>
+python3 CarbonManager.py --rm-endpoint `localhost` --lxd-cert <path to lxd certificate in single quotes> --lxd-key <path to lxd key in single quotes>
 ```
 
 2. Now run ApplicationController as following:
